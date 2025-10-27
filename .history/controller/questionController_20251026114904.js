@@ -4,7 +4,7 @@ const { StatusCodes } = require("http-status-codes");
 // Create a new question
 async function createQuestion(req, res) {
   const { title, description } = req.body;
-  const userId = req.user.userid; // from auth middleware
+  const userId = req.user.userid;
 
   if (!title || !description) {
     return res
@@ -14,7 +14,7 @@ async function createQuestion(req, res) {
 
   try {
     const [result] = await dbConnection.query(
-      "INSERT INTO questions (title, description, user_id) VALUES (?, ?, ?)",
+      "INSERT INTO questions (title, description, userId) VALUES (?, ?, ?)",
       [title, description, userId]
     );
 
@@ -22,7 +22,7 @@ async function createQuestion(req, res) {
       .status(StatusCodes.CREATED)
       .json({ msg: "Question created", questionId: result.insertId });
   } catch (error) {
-    console.log("❌ SQL Error:", error);
+    console.log(,error);
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ msg: "Something went wrong" });
@@ -33,7 +33,7 @@ async function createQuestion(req, res) {
 async function getAllQuestions(req, res) {
   try {
     const [questions] = await dbConnection.query(
-      "SELECT * FROM questions ORDER BY created_at DESC"
+      "SELECT * FROM questions ORDER BY createdAt DESC"
     );
     return res.status(StatusCodes.OK).json({ questions });
   } catch (error) {
@@ -50,7 +50,7 @@ async function getQuestionById(req, res) {
 
   try {
     const [question] = await dbConnection.query(
-      "SELECT * FROM questions WHERE question_id = ?",
+      "SELECT * FROM questions WHERE id = ?",
       [id]
     );
     if (question.length === 0) {
